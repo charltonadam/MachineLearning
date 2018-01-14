@@ -2,15 +2,15 @@ public class Perceptron_v1 {
 
     final double learningRate = .1;
 
-    final int theta = 1;
-    private double thetaWeight;
+    final double theta = 1;
+    public double thetaWeight;
 
-    private int numberOfInputs;
-    private double[] weights;
+    int numberOfInputs;
+    public double[] weights;
 
 
     public Perceptron_v1(int numberOfInputs) {
-        weights = new double[numberOfInputs + 1];
+        weights = new double[numberOfInputs];
         this.numberOfInputs = numberOfInputs;
     }
 
