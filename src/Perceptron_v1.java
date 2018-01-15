@@ -1,6 +1,6 @@
 public class Perceptron_v1 {
 
-    final double learningRate = .1;
+    final double learningRate = .01;
 
     final double theta = 1;
     public double thetaWeight;

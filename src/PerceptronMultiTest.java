@@ -60,7 +60,7 @@ public class PerceptronMultiTest {
             total += Math.abs(thetaWeight - perceptron.thetaWeight);
 
 
-            if(total < .5) {
+            if(total < .1) {
                 break;
             }
 
@@ -85,13 +85,6 @@ public class PerceptronMultiTest {
             }
             System.out.println(perceptron.test(inputs));
 
-
         }
-
-
-
     }
-
-
-
 }
