@@ -56,5 +56,16 @@ public class Perceptron_v1 {
     }
 
 
+    public double testWithConfidence(double[] inputs) {
+        double total = 0;
+        for(int i = 0; i < numberOfInputs; i++) {
+            total += inputs[i] * weights[i];
+        }
+        total += theta * thetaWeight;
+
+        return total;
+    }
+
+
 
 }
