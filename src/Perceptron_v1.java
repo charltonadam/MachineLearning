@@ -39,9 +39,6 @@ public class Perceptron_v1 {
 
         }
 
-
-
-
     }
 
     public boolean test(double[] inputs) {

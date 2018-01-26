@@ -46,6 +46,7 @@ public class MLSystemManager {
 		// Load the ARFF file
 		Matrix data = new Matrix();
 		data.loadArff(fileName);
+		data.shuffle(rand);
 		if (normalize)
 		{
 			System.out.println("Using normalized data\n");

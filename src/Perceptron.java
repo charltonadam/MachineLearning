@@ -15,38 +15,77 @@ public class Perceptron extends SupervisedLearner {
     @Override
     public void train(Matrix features, Matrix labels) throws Exception {
 
-        int numberOfInputs = features.cols();
-        perp = new Perceptron_v1(numberOfInputs);
 
-        double[] savedWeights = perp.weights;
-        double savedTheta = perp.thetaWeight;
-
-        int totalRepititions = 0;
-        int repititionsSinceChange = 0;
-
-        while(repititionsSinceChange < 5 && totalRepititions < 1000) {
-
-            if(weightCheck(savedWeights, perp.weights, savedTheta, perp.thetaWeight) != 0) {
-                repititionsSinceChange = 0;
-            } else {
-                repititionsSinceChange++;
-            }
-            totalRepititions++;
-            savedWeights = perp.weights;
-            savedTheta = perp.thetaWeight;
+        if(true) {   //this is a manual switch for running data with the IRIS data set
+            //inside here is standard data, only binary output
 
 
-            for(int i = 0; i < features.rows(); i++) {
-                boolean result = false;
-                if(labels.get(i, 0) == 1) {
-                    result = true;
+            int seed;
+            int numberOfInputs = features.cols();
+            perp = new Perceptron_v1(numberOfInputs);
+
+            int totalRepititions = 0;
+            int repititionsSinceChange = 0;
+            double accuracy = 0;
+            double previousAccuracy = 0;
+
+
+            while (repititionsSinceChange < 5 && totalRepititions < 1000) {
+
+
+                seed = rand.nextInt();
+
+                features.shuffle(new Random(seed));
+                labels.shuffle(new Random(seed));
+
+
+                if (previousAccuracy - accuracy < -.05) {
+                    repititionsSinceChange = 0;
+                } else {
+                    repititionsSinceChange++;
                 }
-                perp.learn(features.row(i), result);
+
+                previousAccuracy = accuracy;
+                accuracy = 0;
+                totalRepititions++;
+
+
+                for (int i = 0; i < features.rows(); i++) {
+                    boolean result = false;
+                    if (labels.get(i, 0) == 1) {
+                        result = true;
+                    }
+                    perp.learn(features.row(i), result);
+                }
+
+                for (int i = 0; i < features.rows(); i++) {
+                    boolean test = false;
+
+                    if (labels.get(i, 0) == 1) {
+                        test = true;
+                    }
+
+                    accuracy += (perp.test(features.row(i)) == test) ? 1 : 0;
+                }
+                accuracy = accuracy / features.rows();
+
+                //System.out.println("Epoch: " + totalRepititions + "  Accuracy: " + accuracy);
+
+
             }
+
+            System.out.println("total repititions: " + totalRepititions);
+
+
+
+        } else {
+            //This is for the IRIS dataset, triple output, which means we need to have 3 Perceptrons
+
+            
+
+
 
         }
-
-        System.out.println("total repititions: " + totalRepititions);
 
     }
 
@@ -58,29 +97,11 @@ public class Perceptron extends SupervisedLearner {
     }
 
 
-
-    public double weightCheck(double[] weights1, double[] weights2, double theta1, double theta2) {
-
-        double difference = 0;
-
-        for(int i = 0; i < weights1.length; i++) {
-            difference = Math.abs(weights1[i] - weights2[i]);
-        }
-        difference = Math.abs(theta1 - theta2);
-
-
-        return difference;
-    }
-
-
-
-
-
     public static void main(String args[]) {
 
         MLSystemManager runner = new MLSystemManager();
 
-        args = new String[]{"-L", "perceptron", "-A", "testLineSep.arff", "-E", "training"};
+        args = new String[]{"-L", "perceptron", "-A", "testNonLineSep.arff", "-E", "training"};
         try {
             runner.run(args);
         }catch(Exception e) {
