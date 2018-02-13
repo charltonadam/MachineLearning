@@ -1,12 +1,12 @@
 public class Perceptron_v1 {
 
-    final double learningRate = .1;
+    private final double learningRate = .1;
 
-    final double theta = 1;
-    public double thetaWeight;
+    private final double theta = 1;
+    private double thetaWeight;
 
-    int numberOfInputs;
-    public double[] weights;
+    private int numberOfInputs;
+    private double[] weights;
 
 
     public Perceptron_v1(int numberOfInputs) {
@@ -49,10 +49,7 @@ public class Perceptron_v1 {
         }
         total += theta * thetaWeight;
 
-        if(total > 0) {
-            return true;
-        }
-        return false;
+        return (total > 0);
     }
 
 
