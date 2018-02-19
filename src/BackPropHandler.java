@@ -3,11 +3,11 @@ import java.util.Random;
 
 public class BackPropHandler extends SupervisedLearner {
 
-    Random rand;
+    private Random rand;
 
-    final int[] numberOfNodes = {1};    //used to initialize the amount of nodes per layer.  last index is output layer
-    ArrayList<BackPropNode>[] neuralNet;
-    int neuralNetLength;
+    private final int[] numberOfNodes = {1};    //used to initialize the amount of nodes per layer.  last index is output layer
+    private ArrayList<BackPropNode>[] neuralNet;
+    private int neuralNetLength;
 
 
 
@@ -109,7 +109,13 @@ public class BackPropHandler extends SupervisedLearner {
 
                     double[] adjustment = neuralNet[k].get(x).adjustForError(input[x]);
 
+                    for(int z = 0; z < adjustment.length; z++) {
+                        error[z] += adjustment[z];
+                    }
+
                 }
+
+                input = error;
 
             }
 
