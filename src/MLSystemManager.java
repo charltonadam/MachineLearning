@@ -19,7 +19,7 @@ public class MLSystemManager {
 		if (model.equals("baseline")) return new BaselineLearner();
 		 else if (model.equals("perceptron")) return new Perceptron(rand);
 		 else if (model.equals("perceptronMulti")) return new PerceptronMultiData(rand);
-		// else if (model.equals("neuralnet")) return new NeuralNet(rand);
+		 else if (model.equals("neuralnet")) return new BackPropHandler(rand);
 		// else if (model.equals("decisiontree")) return new DecisionTree();
 		// else if (model.equals("knn")) return new InstanceBasedLearner();
 		else throw new Exception("Unrecognized model: " + model);
@@ -47,7 +47,6 @@ public class MLSystemManager {
 		// Load the ARFF file
 		Matrix data = new Matrix();
 		data.loadArff(fileName);
-		data.shuffle(rand);
 		if (normalize)
 		{
 			System.out.println("Using normalized data\n");

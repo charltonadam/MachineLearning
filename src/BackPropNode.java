@@ -14,6 +14,10 @@ public class BackPropNode {
         weights = new double[numberOfInputs + 1]; //bias weight is included in the array, much easier
         this.numberOfInputs = numberOfInputs;
 
+
+
+
+
         //initialize gaussian weights using random.  Might be slightly too large, keep track of potential problems (takes too long to learn)
         for(int i = 0; i < numberOfInputs + 1; i++) {
             weights[i] = rand.nextGaussian() * .5;
@@ -47,7 +51,6 @@ public class BackPropNode {
         double[] errorVector = new double[numberOfInputs];
 
         double output = predict(inputs);
-
         double error = (target - output) * output * (1 - output);
 
         for(int i = 0; i < numberOfInputs; i++) {
@@ -62,7 +65,6 @@ public class BackPropNode {
     public double[] adjustForError(double netError) {
 
         double[] errorVector = new double[numberOfInputs];
-
         double error = previousOutput * (1 - previousOutput) * netError;
 
         for(int i = 0; i < numberOfInputs; i++) {
@@ -77,6 +79,15 @@ public class BackPropNode {
 
     }
 
+    public String toString() {
 
+        String ret = "";
+
+        for(int i = 0; i < numberOfInputs + 1; i++) {
+            ret += weights[i] + "\n";
+        }
+        return ret;
+
+    }
 
 }

@@ -86,7 +86,7 @@ public class Perceptron extends SupervisedLearner {
 
         MLSystemManager runner = new MLSystemManager();
 
-        args = new String[]{"-L", "perceptron", "-A", "testNonLineSep.arff", "-E", "training"};
+        args = new String[]{"-L", "perceptron", "-A", "voting.arff", "-E", "training"};
         try {
             runner.run(args);
         }catch(Exception e) {
@@ -95,5 +95,12 @@ public class Perceptron extends SupervisedLearner {
         }
 
     }
+
+
+
+
+
+
+
 
 }
