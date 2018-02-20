@@ -5,7 +5,7 @@ public class BackPropHandler extends SupervisedLearner {
 
     private Random rand;
 
-    private final int[] numberOfNodes = {8, 3};    //used to initialize the amount of nodes per layer.  last index is output layer
+    private final int[] numberOfNodes = {26, 11};    //used to initialize the amount of nodes per layer.  last index is output layer
     private int neuralNetLength;
     private BackPropLayer network;
 
@@ -41,7 +41,7 @@ public class BackPropHandler extends SupervisedLearner {
         double previousAccuracy = 0;
         int testSet = features.rows() / 4;
 
-        while(reps < 1000 && repsSinceBest < 8) {
+        while(reps < 5 || (reps < 1000 && repsSinceBest < 5)) {
 
             reps++;
             repsSinceBest++;
@@ -54,6 +54,7 @@ public class BackPropHandler extends SupervisedLearner {
                 }
             }
             accuracy = accuracy / testSet;
+            System.out.println(accuracy);
             if(accuracy > previousAccuracy) {
                 previousAccuracy = accuracy;
                 repsSinceBest = 0;
@@ -124,7 +125,7 @@ public class BackPropHandler extends SupervisedLearner {
 
         MLSystemManager runner = new MLSystemManager();
 
-        args = new String[]{"-L", "neuralnet", "-A", "iris.arff", "-E", "random", ".75"};
+        args = new String[]{"-L", "neuralnet", "-A", "vowel.arff", "-E", "random", ".75"};
         //args = new String[]{"-L", "neuralnet", "-A", "iris.arff", "-E", "training"};
         try {
             runner.run(args);
