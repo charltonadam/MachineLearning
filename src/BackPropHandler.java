@@ -5,7 +5,7 @@ public class BackPropHandler extends SupervisedLearner {
 
     private Random rand;
 
-    private final int[] numberOfNodes = {3};    //used to initialize the amount of nodes per layer.  last index is output layer
+    private final int[] numberOfNodes = {8, 3};    //used to initialize the amount of nodes per layer.  last index is output layer
     private int neuralNetLength;
     private BackPropLayer network;
 
@@ -34,17 +34,37 @@ public class BackPropHandler extends SupervisedLearner {
             current = temp;
         }
 
+        features.shuffle(rand, labels);
+
+        int reps = 0;
+        int repsSinceBest = 0;
+        double previousAccuracy = 0;
+        int testSet = features.rows() / 4;
+
+        while(reps < 1000 && repsSinceBest < 8) {
+
+            reps++;
+            repsSinceBest++;
+
+            //calculate Accuracy, 25% rule
+            double accuracy = 0;
+            for(int i = 0; i < testSet; i++) {
+                if(labels.get(i, 0) == sanePrediction(features.row(i))) {
+                    accuracy++;
+                }
+            }
+            accuracy = accuracy / testSet;
+            if(accuracy > previousAccuracy) {
+                previousAccuracy = accuracy;
+                repsSinceBest = 0;
+            }
 
 
-        for(int reps = 0; reps < 20; reps++) {
-            features.shuffle(rand, labels);
 
+            // loop through the inputs
+            for (int i = testSet; i < features.rows(); i++) {
 
-            //now that the network is initialized, loop through the inputs
-
-            for (int i = 0; i < features.rows(); i++) {
-
-                //format the output
+                //format the output, works great for multiple output nodes
                 double[] formattedAnswers = new double[numberOfNodes[numberOfNodes.length - 1]];
                 for(int x = 0; x < formattedAnswers.length; x++) {
                     if(labels.row(i)[0] == x) {
@@ -60,7 +80,8 @@ public class BackPropHandler extends SupervisedLearner {
             }
         }
 
-        System.out.println(network.toString());
+        //System.out.println(network.toString());
+        System.out.println("Number of Reps: " + reps);
 
     }
 
@@ -79,9 +100,21 @@ public class BackPropHandler extends SupervisedLearner {
             }
         }
         labels[0] = bestAnswer;
+    }
 
+    public int sanePrediction(double[] features) {
+        double[] temp = network.predict(features);
 
-        System.out.println(temp[0] + "     " + temp[1] + "     " + temp[2] + "     " + bestAnswer);
+        int bestAnswer = 0;
+        double bestConfidence = 0;
+
+        for(int i = 0; i < temp.length; i++) {
+            if(bestConfidence < temp[i]) {
+                bestAnswer = i;
+                bestConfidence = temp[i];
+            }
+        }
+        return bestAnswer;
     }
 
 
@@ -91,7 +124,8 @@ public class BackPropHandler extends SupervisedLearner {
 
         MLSystemManager runner = new MLSystemManager();
 
-        args = new String[]{"-L", "neuralnet", "-A", "iris.arff", "-E", "training"};
+        args = new String[]{"-L", "neuralnet", "-A", "iris.arff", "-E", "random", ".75"};
+        //args = new String[]{"-L", "neuralnet", "-A", "iris.arff", "-E", "training"};
         try {
             runner.run(args);
         }catch(Exception e) {
