@@ -8,15 +8,15 @@ public class BackPropNode {
 
     double previousOutput;
     double[] previousInputs;
+    double[] previousDeltaWeights;
+    final double momentumAmount = 0;
 
     public BackPropNode(int numberOfInputs, Random rand) {
 
         weights = new double[numberOfInputs + 1]; //bias weight is included in the array, much easier
         this.numberOfInputs = numberOfInputs;
 
-
-
-
+        previousDeltaWeights = new double[numberOfInputs + 1];
 
         //initialize gaussian weights using random.  Might be slightly too large, keep track of potential problems (takes too long to learn)
         for(int i = 0; i < numberOfInputs + 1; i++) {
@@ -69,10 +69,13 @@ public class BackPropNode {
 
         for(int i = 0; i < numberOfInputs; i++) {
             errorVector[i] = error * weights[i];
-            weights[i] += learningRate * error * previousInputs[i];
-
+            double deltaWeight = learningRate * error * previousInputs[i];
+            weights[i] += deltaWeight + momentumAmount * previousDeltaWeights[i];
+            previousDeltaWeights[i] = deltaWeight;
         }
-        weights[numberOfInputs] += learningRate * error;
+        double deltaWeight = learningRate * error;
+        weights[numberOfInputs] += deltaWeight + momentumAmount * previousDeltaWeights[numberOfInputs];
+        previousDeltaWeights[numberOfInputs] = deltaWeight;
 
         return errorVector;
 

@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -5,11 +7,11 @@ public class BackPropHandler extends SupervisedLearner {
 
     private Random rand;
 
-    private final int[] numberOfNodes = {26, 11};    //used to initialize the amount of nodes per layer.  last index is output layer
+    private final int[] numberOfNodes = {1, 11};    //used to initialize the amount of nodes per layer.  last index is output layer
     private int neuralNetLength;
     private BackPropLayer network;
 
-
+    static double SquareError = 0;
 
 
     public BackPropHandler(Random rand) {
@@ -21,6 +23,18 @@ public class BackPropHandler extends SupervisedLearner {
 
     @Override
     public void train(Matrix features, Matrix labels) throws Exception {
+
+
+        File outputFile = new File("output.csv");
+        PrintWriter writer = null;
+
+        try {
+            writer = new PrintWriter(outputFile);
+        }catch(Exception ignored) {
+
+        }
+        writer.println("Epoch,VS MSE,VS percentage,training MSE");
+
 
         //first things first, create the layer network
         int numberOfInputs = features.cols();
@@ -38,27 +52,43 @@ public class BackPropHandler extends SupervisedLearner {
 
         int reps = 0;
         int repsSinceBest = 0;
-        double previousAccuracy = 0;
-        int testSet = features.rows() / 4;
+        double previousVSAccuracy = 0;
+        int testSet = features.rows() / 4;  //25% for validation set
 
-        while(reps < 5 || (reps < 1000 && repsSinceBest < 5)) {
+        while(reps < 5 || (reps < 10000 && repsSinceBest < 5)) {
 
             reps++;
             repsSinceBest++;
 
-            //calculate Accuracy, 25% rule
-            double accuracy = 0;
+            //calculate Accuracy using Validation Set
+            double VSaccuracy = 0;
+            double accuracyPercentage = 0;
             for(int i = 0; i < testSet; i++) {
                 if(labels.get(i, 0) == sanePrediction(features.row(i))) {
-                    accuracy++;
+                    accuracyPercentage++;
                 }
+                VSaccuracy += predictionWithSquareError(features.row(i), labels.get(i, 0));
             }
-            accuracy = accuracy / testSet;
-            System.out.println(accuracy);
-            if(accuracy > previousAccuracy) {
-                previousAccuracy = accuracy;
+            accuracyPercentage = accuracyPercentage / testSet;
+            VSaccuracy = VSaccuracy / testSet;
+            if(VSaccuracy < previousVSAccuracy * .999 || reps < 10) {
+                previousVSAccuracy = VSaccuracy;
                 repsSinceBest = 0;
             }
+
+            double trainingAccuracy = 0;
+            for(int i = testSet; i < features.rows(); i++) {
+                trainingAccuracy += predictionWithSquareError(features.row(i), labels.get(i, 0));
+            }
+            trainingAccuracy = trainingAccuracy / (features.rows() - testSet);
+
+            writer.println(reps + "," + VSaccuracy + "," + accuracyPercentage + "," + trainingAccuracy);
+
+            System.out.println("Epoch: " + reps);
+            System.out.println("VS Accuracy MSE: " + VSaccuracy);
+            //System.out.println("VS Accuracy percentage: ");
+            System.out.println("Training Accuracy MSE: " + trainingAccuracy + "\n");
+
 
 
 
@@ -80,9 +110,10 @@ public class BackPropHandler extends SupervisedLearner {
 
             }
         }
+        writer.close();
 
         //System.out.println(network.toString());
-        System.out.println("Number of Reps: " + reps);
+        //System.out.println("Number of Reps: " + reps);
 
     }
 
@@ -118,6 +149,14 @@ public class BackPropHandler extends SupervisedLearner {
         return bestAnswer;
     }
 
+    public double predictionWithSquareError(double[] features, double answer) {
+
+        double[] temp = network.predict(features);
+
+        return Math.pow(temp[(int) answer] - 1, 2);
+
+    }
+
 
 
 
@@ -125,7 +164,7 @@ public class BackPropHandler extends SupervisedLearner {
 
         MLSystemManager runner = new MLSystemManager();
 
-        args = new String[]{"-L", "neuralnet", "-A", "vowel.arff", "-E", "random", ".75"};
+        args = new String[]{"-L", "neuralnet", "-A", "vowelFixed.arff", "-E", "random", ".75"};
         //args = new String[]{"-L", "neuralnet", "-A", "iris.arff", "-E", "training"};
         try {
             runner.run(args);
@@ -134,6 +173,64 @@ public class BackPropHandler extends SupervisedLearner {
 
         }
 
+    }
+
+    public double measureAccuracy(Matrix features, Matrix labels, Matrix confusion) throws Exception
+    {
+        if(features.rows() != labels.rows())
+            throw(new Exception("Expected the features and labels to have the same number of rows"));
+        if(labels.cols() != 1)
+            throw(new Exception("Sorry, this method currently only supports one-dimensional labels"));
+        if(features.rows() == 0)
+            throw(new Exception("Expected at least one row"));
+
+        int labelValues = labels.valueCount(0);
+        if(labelValues == 0) // If the label is continuous...
+        {
+            // The label is continuous, so measure root mean squared error
+            double[] pred = new double[1];
+            double sse = 0.0;
+            for(int i = 0; i < features.rows(); i++)
+            {
+                double[] feat = features.row(i);
+                double[] targ = labels.row(i);
+                pred[0] = 0.0; // make sure the prediction is not biassed by a previous prediction
+                predict(feat, pred);
+                double delta = targ[0] - pred[0];
+                sse += (delta * delta);
+            }
+            return Math.sqrt(sse / features.rows());
+        }
+        else
+        {
+            // The label is nominal, so measure predictive accuracy
+            if(confusion != null)
+            {
+                confusion.setSize(labelValues, labelValues);
+                for(int i = 0; i < labelValues; i++)
+                    confusion.setAttrName(i, labels.attrValue(0, i));
+            }
+            int correctCount = 0;
+            double[] prediction = new double[1];
+            double squareError = 0;
+            for(int i = 0; i < features.rows(); i++)
+            {
+                double[] feat = features.row(i);
+                int targ = (int)labels.get(i, 0);
+                if(targ >= labelValues)
+                    throw new Exception("The label is out of range");
+                predict(feat, prediction);
+                squareError += predictionWithSquareError(feat, targ);
+                int pred = (int)prediction[0];
+                if(confusion != null)
+                    confusion.set(targ, pred, confusion.get(targ, pred) + 1);
+                if(pred == targ)
+                    correctCount++;
+            }
+            squareError = squareError / features.rows();
+            System.out.println("Square Error for Test: " + squareError);
+            return (double)correctCount / features.rows();
+        }
     }
 
 
