@@ -9,7 +9,7 @@ public class BackPropNode {
     double previousOutput;
     double[] previousInputs;
     double[] previousDeltaWeights;
-    final double momentumAmount = 0;
+    final double momentumAmount = 1.75;
 
     public BackPropNode(int numberOfInputs, Random rand) {
 

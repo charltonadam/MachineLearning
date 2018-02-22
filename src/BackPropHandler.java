@@ -7,11 +7,9 @@ public class BackPropHandler extends SupervisedLearner {
 
     private Random rand;
 
-    private final int[] numberOfNodes = {1, 11};    //used to initialize the amount of nodes per layer.  last index is output layer
+    private final int[] numberOfNodes = {64, 11};    //used to initialize the amount of nodes per layer.  last index is output layer
     private int neuralNetLength;
     private BackPropLayer network;
-
-    static double SquareError = 0;
 
 
     public BackPropHandler(Random rand) {
@@ -84,10 +82,10 @@ public class BackPropHandler extends SupervisedLearner {
 
             writer.println(reps + "," + VSaccuracy + "," + accuracyPercentage + "," + trainingAccuracy);
 
-            System.out.println("Epoch: " + reps);
-            System.out.println("VS Accuracy MSE: " + VSaccuracy);
+            //System.out.println("Epoch: " + reps);
+            //System.out.println("VS Accuracy MSE: " + VSaccuracy);
             //System.out.println("VS Accuracy percentage: ");
-            System.out.println("Training Accuracy MSE: " + trainingAccuracy + "\n");
+            //System.out.println("Training Accuracy MSE: " + trainingAccuracy + "\n");
 
 
 
@@ -113,7 +111,7 @@ public class BackPropHandler extends SupervisedLearner {
         writer.close();
 
         //System.out.println(network.toString());
-        //System.out.println("Number of Reps: " + reps);
+        System.out.println("Number of Reps: " + reps);
 
     }
 
@@ -228,7 +226,7 @@ public class BackPropHandler extends SupervisedLearner {
                     correctCount++;
             }
             squareError = squareError / features.rows();
-            System.out.println("Square Error for Test: " + squareError);
+            //System.out.println("Square Error for Test: " + squareError);
             return (double)correctCount / features.rows();
         }
     }
