@@ -7,7 +7,7 @@ public class BackPropHandler extends SupervisedLearner {
 
     private Random rand;
 
-    private final int[] numberOfNodes = {64, 11};    //used to initialize the amount of nodes per layer.  last index is output layer
+    private final int[] numberOfNodes = {20, 4};    //used to initialize the amount of nodes per layer.  last index is output layer
     private int neuralNetLength;
     private BackPropLayer network;
 
@@ -53,7 +53,7 @@ public class BackPropHandler extends SupervisedLearner {
         double previousVSAccuracy = 0;
         int testSet = features.rows() / 4;  //25% for validation set
 
-        while(reps < 5 || (reps < 10000 && repsSinceBest < 5)) {
+        while(reps < 10000 && repsSinceBest < 5) {
 
             reps++;
             repsSinceBest++;
@@ -69,7 +69,7 @@ public class BackPropHandler extends SupervisedLearner {
             }
             accuracyPercentage = accuracyPercentage / testSet;
             VSaccuracy = VSaccuracy / testSet;
-            if(VSaccuracy < previousVSAccuracy * .999 || reps < 10) {
+            if(VSaccuracy < previousVSAccuracy * .999 || reps < 50) {
                 previousVSAccuracy = VSaccuracy;
                 repsSinceBest = 0;
             }
@@ -162,7 +162,7 @@ public class BackPropHandler extends SupervisedLearner {
 
         MLSystemManager runner = new MLSystemManager();
 
-        args = new String[]{"-L", "neuralnet", "-A", "vowelFixed.arff", "-E", "random", ".75"};
+        args = new String[]{"-L", "neuralnet", "-A", "NameData.arff", "-E", "training"};
         //args = new String[]{"-L", "neuralnet", "-A", "iris.arff", "-E", "training"};
         try {
             runner.run(args);
@@ -173,8 +173,7 @@ public class BackPropHandler extends SupervisedLearner {
 
     }
 
-    public double measureAccuracy(Matrix features, Matrix labels, Matrix confusion) throws Exception
-    {
+    public double measureAccuracy(Matrix features, Matrix labels, Matrix confusion) throws Exception {
         if(features.rows() != labels.rows())
             throw(new Exception("Expected the features and labels to have the same number of rows"));
         if(labels.cols() != 1)
@@ -230,13 +229,6 @@ public class BackPropHandler extends SupervisedLearner {
             return (double)correctCount / features.rows();
         }
     }
-
-
-
-
-
-
-
 
 
 }
