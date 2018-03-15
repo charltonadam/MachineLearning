@@ -21,7 +21,7 @@ public class MLSystemManager {
 		 else if (model.equals("perceptronMulti")) return new PerceptronMultiData(rand);
 		 else if (model.equals("neuralnet")) return new BackPropHandler(rand);
 		 else if (model.equals("decisiontree")) return new DecisionTreeHandler();
-		// else if (model.equals("knn")) return new InstanceBasedLearner();
+		 else if (model.equals("knn")) return new NearestNeighborHandler();
 		else throw new Exception("Unrecognized model: " + model);
 	}
 
