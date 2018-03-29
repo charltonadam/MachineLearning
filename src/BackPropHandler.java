@@ -7,7 +7,7 @@ public class BackPropHandler extends SupervisedLearner {
 
     private Random rand;
 
-    private final int[] numberOfNodes = {20, 4};    //used to initialize the amount of nodes per layer.  last index is output layer
+    private final int[] numberOfNodes = {20, 20, 4};    //used to initialize the amount of nodes per layer.  last index is output layer
     private int neuralNetLength;
     private BackPropLayer network;
 
@@ -69,7 +69,7 @@ public class BackPropHandler extends SupervisedLearner {
             }
             accuracyPercentage = accuracyPercentage / testSet;
             VSaccuracy = VSaccuracy / testSet;
-            if(VSaccuracy < previousVSAccuracy * .999 || reps < 50) {
+            if(VSaccuracy < previousVSAccuracy * .999 || reps < 200) {
                 previousVSAccuracy = VSaccuracy;
                 repsSinceBest = 0;
             }

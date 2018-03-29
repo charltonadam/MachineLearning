@@ -39,7 +39,7 @@ public class BackPropNode {
             total += inputs[i] * weights[i];
         }
         total += weights[numberOfInputs];
-        previousOutput = 1/(1 + Math.pow(Math.E, total * -1));
+        previousOutput = 1.0/(1.0 + Math.pow(Math.E, total * -1));
 
         return previousOutput;
 

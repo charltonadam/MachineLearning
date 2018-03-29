@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class NearestNeigborNode {
 
@@ -9,18 +7,42 @@ public class NearestNeigborNode {
     boolean weighted;
     final boolean[] continuousAttributes = {false, true, true, false, false, false, false, true, false, false, true, false, false, true, true};
 
+    List<Map<Double, Double>> masterLookup;
+    double totalValues;
+
     public void train(ArrayList<double[]> features, ArrayList<double[]> labels, int k, boolean w) {
 
 
         data = new ArrayList<>();
         this.k = k;
         weighted = w;
+        masterLookup = new LinkedList<>();
+        totalValues = features.size();
 
         for(int i = 0; i < features.size(); i++) {
             data.add(new Node(features.get(i), labels.get(i)));
         }
 
-        
+        for(int i = 0; i < continuousAttributes.length; i++) {
+            //cycle through attribute columns
+            masterLookup.add(new HashMap<>());
+            if(continuousAttributes[i]) {
+                continue;
+            }
+            Map<Double, Double> masterMap = masterLookup.get(i);
+
+            for(int j = 0; j < features.size(); j++) {
+
+                masterMap.putIfAbsent(features.get(j)[i], 0.0);
+                if(labels.get(j)[0] == 0) {
+                    masterMap.replace(features.get(j)[i], masterMap.get(features.get(j)[i]) - 1);
+                } else {
+                    masterMap.replace(features.get(j)[i], masterMap.get(features.get(j)[i]) + 1);
+                }
+            }
+
+
+        }
 
 
 
@@ -162,7 +184,7 @@ public class NearestNeigborNode {
             classification = labels[0];
         }
 
-        public double setDistance(double[] inputs) {
+        public void setDistance(double[] inputs) {
             distance = 0;
 
             for(int i = 0; i < features.length; i++) {
@@ -170,15 +192,17 @@ public class NearestNeigborNode {
                 if(inputs[i] >= 1000) {
                     distance += 1;
                 } else if(continuousAttributes[i]) {
+
+
+
                     distance += Math.abs(features[i] - inputs[i]);
                 } else {
-                    //this one is the nominal features
-                    distance += features[i] == inputs[i] ? 0:1;
+                    double value1 = masterLookup.get(i).get(features[i]);
+                    double value2 = masterLookup.get(i).get(inputs[i]);
+                    double ratio = Math.abs(value1 - value2) / totalValues;
+                    distance += ratio;
                 }
             }
-
-
-            return distance;
         }
     }
 
